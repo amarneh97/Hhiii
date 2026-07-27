@@ -10,6 +10,7 @@ class PostStats:
     comments: int
     timestamp: str = ""
     permalink: str = ""
+    caption: str = ""
 
     @property
     def interactions(self) -> int:
