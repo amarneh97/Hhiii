@@ -43,7 +43,7 @@ def fetch_engagement_report(
     media = _get(
         f"{GRAPH_API_BASE}/{ig_user_id}/media",
         {
-            "fields": "id,like_count,comments_count,timestamp,permalink",
+            "fields": "id,like_count,comments_count,timestamp,permalink,caption",
             "limit": limit,
             "access_token": access_token,
         },
@@ -56,6 +56,7 @@ def fetch_engagement_report(
             comments=item.get("comments_count", 0) or 0,
             timestamp=item.get("timestamp", ""),
             permalink=item.get("permalink", ""),
+            caption=item.get("caption", "") or "",
         )
         for item in media.get("data", [])
     ]
