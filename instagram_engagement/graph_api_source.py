@@ -65,3 +65,16 @@ def fetch_engagement_report(
         followers=account.get("followers_count", 0),
         posts=posts,
     )
+
+
+def fetch_comments(media_id: str, access_token: str, limit: int = 50) -> list:
+    """يجلب أحدث التعليقات على منشور معيّن (id, username, text, timestamp)."""
+    data = _get(
+        f"{GRAPH_API_BASE}/{media_id}/comments",
+        {
+            "fields": "id,username,text,timestamp",
+            "limit": limit,
+            "access_token": access_token,
+        },
+    )
+    return data.get("data", [])

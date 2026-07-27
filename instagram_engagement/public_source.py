@@ -62,3 +62,29 @@ def fetch_engagement_report(
         followers=profile.followers,
         posts=posts,
     )
+
+
+def fetch_comments(
+    shortcode: str,
+    limit: int = 20,
+    session_username: str | None = None,
+) -> list:
+    """يجلب أحدث التعليقات على منشور عام معيّن عبر رمزه القصير (shortcode)."""
+    loader = instaloader.Instaloader(download_pictures=False)
+    if session_username:
+        loader.load_session_from_file(session_username)
+
+    post = instaloader.Post.from_shortcode(loader.context, shortcode)
+    comments = []
+    for comment in post.get_comments():
+        comments.append(
+            {
+                "id": str(comment.id),
+                "username": comment.owner.username,
+                "text": comment.text,
+                "timestamp": comment.created_at_utc.isoformat(),
+            }
+        )
+        if len(comments) >= limit:
+            break
+    return comments

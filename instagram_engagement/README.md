@@ -37,6 +37,34 @@ IG_ACCESS_TOKEN=your_token_here
 python main.py public --username some_public_account --limit 25
 ```
 
+## 3) مراقبة التفاعل وإشعارات فورية (لايك/تعليق/متابعة جديدة)
+
+أمر `watch` يفحص الحساب دوريًا (أو مرة واحدة عبر `--once`)، يقارن النتيجة بآخر حالة
+محفوظة في ملف JSON محلي، ويرسل إشعارًا عند اكتشاف أي زيادة في: عدد المتابعين،
+لايكات منشور، تعليقات منشور (مع اسم المعلّق ونص التعليق عند توفره)، أو ظهور
+منشور جديد.
+
+أول فحص لا يُصدر إشعارات تفاعل — فقط يسجّل "الحالة الأولية"، وابتداءً من الفحص
+الثاني تُكتشف الفروقات (deltas) وتُرسَل كإشعارات.
+
+```bash
+# مراقبة حساب عام كل 5 دقائق، إشعار في الطرفية
+python main.py watch --source public --username some_public_account --interval 300
+
+# مراقبة حساب تملكه عبر Graph API، إشعار عبر Slack/Discord Webhook
+python main.py watch --source graph-api \
+  --ig-user-id 17841400000000000 --access-token "EAAG..." \
+  --notify webhook --webhook-url "https://hooks.slack.com/services/..." --webhook-style slack
+
+# فحص واحد فقط (مناسب لتشغيله عبر cron كل بضع دقائق)
+python main.py watch --source public --username some_public_account --once
+```
+
+قنوات الإشعار المتاحة عبر `--notify` (يمكن الجمع بينها):
+- `console`: طباعة في الطرفية (الافتراضي).
+- `desktop`: إشعار سطح مكتب (عبر `notify-send` في لينكس أو `osascript` في ماك).
+- `webhook`: إرسال إلى رابط Slack/Discord عبر `--webhook-url`.
+
 ## التثبيت
 
 ```bash
@@ -51,6 +79,9 @@ instagram_engagement/
 ├── engagement.py         # نماذج البيانات وحساب معدل التفاعل
 ├── graph_api_source.py   # مصدر البيانات: Instagram Graph API الرسمي
 ├── public_source.py      # مصدر البيانات: instaloader (حسابات عامة)
+├── watcher.py             # منطق المراقبة واكتشاف التفاعل الجديد
+├── state_store.py         # حفظ/تحميل آخر حالة معروفة للحساب
+├── notifier.py            # قنوات الإشعار (console / desktop / webhook)
 ├── requirements.txt
 └── .env.example
 ```
