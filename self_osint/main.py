@@ -27,7 +27,7 @@ from report import to_console, to_json, to_markdown
 
 load_dotenv()
 
-ALL_SOURCES = ["hibp", "gravatar", "usernames", "github", "git-history"]
+ALL_SOURCES = ["hibp", "gravatar", "usernames", "github", "instagram", "x", "git-history"]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -129,6 +129,26 @@ def run_scan(args: argparse.Namespace) -> ScanReport:
                     report.add(finding)
             except Exception as exc:
                 report.add_error("github", f"{username}: {exc}")
+
+    if "instagram" in sources and args.username:
+        from sources import instagram
+
+        for username in args.username:
+            try:
+                for finding in instagram.check_username(username, timeout=args.timeout):
+                    report.add(finding)
+            except Exception as exc:
+                report.add_error("instagram", f"{username}: {exc}")
+
+    if "x" in sources and args.username:
+        from sources import x_twitter
+
+        for username in args.username:
+            try:
+                for finding in x_twitter.check_username(username, timeout=args.timeout):
+                    report.add(finding)
+            except Exception as exc:
+                report.add_error("x", f"{username}: {exc}")
 
     if "git-history" in sources and args.repo:
         from sources import git_history
