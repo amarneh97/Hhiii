@@ -95,3 +95,31 @@ def test_oembed_with_author_marks_account_as_existing():
 def test_empty_or_malformed_oembed_is_not_an_account():
     for payload in ({}, None, [], {"html": "<blockquote/>"}):
         assert interpret_oembed(payload)["exists"] is False
+
+
+def test_blocked_js_shell_is_reported_as_error_not_clean(monkeypatch):
+    """صفحة 200 بلا وسوم og تعني حجب القراءة — لا يجوز إرجاع 'لا يوجد انكشاف'."""
+    import pytest
+
+    from sources import instagram
+
+    class FakeResponse:
+        status_code = 200
+        text = "<html><body><div id='react-root'></div></body></html>"
+
+    monkeypatch.setattr(instagram.requests, "get", lambda *a, **k: FakeResponse())
+    with pytest.raises(RuntimeError) as exc:
+        instagram.check_username("anyone")
+    assert "محجوبة" in str(exc.value)
+
+
+def test_real_404_still_returns_no_findings(monkeypatch):
+    """الحساب غير الموجود فعلًا (404) يبقى نتيجة سلبية صحيحة، لا خطأ."""
+    from sources import instagram
+
+    class FakeResponse:
+        status_code = 404
+        text = ""
+
+    monkeypatch.setattr(instagram.requests, "get", lambda *a, **k: FakeResponse())
+    assert instagram.check_username("ghost_account") == []

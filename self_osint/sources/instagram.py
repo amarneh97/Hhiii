@@ -185,4 +185,15 @@ def check_username(username: str, timeout: int = 15) -> list:
     if response.status_code != 200:
         raise RuntimeError(f"رد غير متوقع من إنستغرام (HTTP {response.status_code}).")
 
-    return build_findings(username, parse_profile_html(response.text))
+    profile = parse_profile_html(response.text)
+    if not profile["exists"]:
+        # إنستغرام يردّ 200 بصفحة JavaScript فارغة بلا وسوم Open Graph حين يحجب
+        # القارئ الآلي. هذا ليس "لا يوجد انكشاف": نحن ببساطة لم نقرأ شيئًا.
+        # إعادة قائمة فارغة هنا تعني إبلاغ المستخدم بأنه نظيف دون أي دليل.
+        raise RuntimeError(
+            "إنستغرام ردّ بصفحة بلا بيانات ملف (وسوم Open Graph غائبة) — قراءة آلية محجوبة، "
+            f"وليست نتيجة سلبية. افتح {PROFILE_URL.format(username=username)} في متصفح "
+            "غير مسجَّل الدخول، أو الصق الرابط في محادثة لترى معاينته."
+        )
+
+    return build_findings(username, profile)
