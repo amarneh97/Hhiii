@@ -8,8 +8,8 @@ from sources.instagram import build_findings, parse_profile_html  # noqa: E402
 from sources.x_twitter import interpret_oembed  # noqa: E402
 
 PUBLIC_HTML = '''
-<meta property="og:title" content="Mohammad Amarneh (@some_user) &bull; Instagram photos and videos" />
-<meta property="og:description" content="1,234 Followers, 567 Following, 89 Posts - See Instagram photos and videos from Mohammad Amarneh (@some_user)" />
+<meta property="og:title" content="Test User (@some_user) &bull; Instagram photos and videos" />
+<meta property="og:description" content="1,234 Followers, 567 Following, 89 Posts - See Instagram photos and videos from Test User (@some_user)" />
 <meta property="og:image" content="https://example.com/pic.jpg" />
 <script>{"is_private":false,"is_verified":false,"external_url":"https:\\/\\/example.com\\/me"}</script>
 '''
@@ -28,7 +28,7 @@ EMPTY_HTML = "<html><body>nothing here</body></html>"
 def test_parses_name_handle_and_counts():
     profile = parse_profile_html(PUBLIC_HTML)
     assert profile["exists"] is True
-    assert profile["full_name"] == "Mohammad Amarneh"
+    assert profile["full_name"] == "Test User"
     assert profile["username"] == "some_user"
     assert profile["followers"] == "1,234"
     assert profile["following"] == "567"
@@ -87,9 +87,9 @@ def test_real_name_raises_severity_over_bare_profile():
 
 def test_oembed_with_author_marks_account_as_existing():
     result = interpret_oembed(
-        {"author_name": "Mohammad", "author_url": "https://twitter.com/m_amarneh"}
+        {"author_name": "Test", "author_url": "https://twitter.com/example_user"}
     )
-    assert result == {"exists": True, "display_name": "Mohammad", "username": "m_amarneh"}
+    assert result == {"exists": True, "display_name": "Test", "username": "example_user"}
 
 
 def test_empty_or_malformed_oembed_is_not_an_account():
