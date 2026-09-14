@@ -52,7 +52,6 @@ def fetch_engagement_report(
                 comments=post.comments,
                 timestamp=post.date_utc.isoformat(),
                 permalink=f"https://www.instagram.com/p/{post.shortcode}/",
-                caption=post.caption or "",
             )
         )
         if len(posts) >= limit:
