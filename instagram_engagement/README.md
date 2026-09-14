@@ -37,32 +37,7 @@ IG_ACCESS_TOKEN=your_token_here
 python main.py public --username some_public_account --limit 25
 ```
 
-## 3) بحث وفلترة التفاعلات
-
-أمر `search` يجلب منشورات الحساب ثم يفلترها حسب أي مجموعة من المعايير التالية
-(يمكن الجمع بينها): كلمة مفتاحية (تُطابَق مع نص المنشور والرابط)، أقل/أعلى عدد
-لايكات، أقل/أعلى عدد تعليقات، أقل إجمالي تفاعل، وفترة زمنية (`--since`/`--until`).
-كما يدعم ترتيب النتائج (`--sort-by`) وعرض أفضل N نتيجة فقط (`--top`).
-
-```bash
-# منشورات تحتوي كلمة "تخفيضات" وحصلت على 100 لايك فأكثر، مرتّبة تنازليًا حسب التفاعل
-python main.py search --source public --username some_public_account \
-  --keyword تخفيضات --min-likes 100 --sort-by interactions
-
-# منشورات ضمن فترة زمنية محددة عبر Graph API
-python main.py search --source graph-api --ig-user-id 17841400000000000 \
-  --access-token "EAAG..." --since 2024-01-01 --until 2024-06-30 --top 5
-```
-
-أمر `search-comments` يجلب تعليقات منشور معيّن ويفلترها حسب كلمة مفتاحية
-و/أو اسم مستخدم دقيق:
-
-```bash
-python main.py search-comments --source public --post-id ABC123 \
-  --keyword رائع --author some_user
-```
-
-## 4) مراقبة التفاعل وإشعارات فورية (لايك/تعليق/متابعة جديدة)
+## 3) مراقبة التفاعل وإشعارات فورية (لايك/تعليق/متابعة جديدة)
 
 أمر `watch` يفحص الحساب دوريًا (أو مرة واحدة عبر `--once`)، يقارن النتيجة بآخر حالة
 محفوظة في ملف JSON محلي، ويرسل إشعارًا عند اكتشاف أي زيادة في: عدد المتابعين،
@@ -107,9 +82,6 @@ instagram_engagement/
 ├── watcher.py             # منطق المراقبة واكتشاف التفاعل الجديد
 ├── state_store.py         # حفظ/تحميل آخر حالة معروفة للحساب
 ├── notifier.py            # قنوات الإشعار (console / desktop / webhook)
-├── filters.py             # بحث وفلترة المنشورات والتعليقات
-├── tests/
-│   └── test_filters.py    # اختبارات وحدة لمنطق البحث والفلترة
 ├── requirements.txt
 └── .env.example
 ```
